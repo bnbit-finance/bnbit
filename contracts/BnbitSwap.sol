@@ -107,8 +107,7 @@ interface IPancakeRouter01 {
         returns (uint[] memory amounts);
 }
 
-// File: contracts\interfaces\IPancakeRouter02.sol
-
+// PancakeRouter01 is a router that routes between two token pairs.
 pragma solidity >=0.6.2;
 
 interface IPancakeRouter02 is IPancakeRouter01 {
@@ -158,6 +157,9 @@ interface IPancakeRouter02 is IPancakeRouter01 {
     ) external;
 }
 
+// Language: solidity
+// Path: contracts/BnbitSwap.sol
+// IBEP20
 interface IBEP20 {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
@@ -195,6 +197,7 @@ interface IWBEP20 {
 }
 
 contract BnbitSwap {
+    // pancake router
     IPancakeRouter02 public PKRouter;
     IWBEP20 public Iwep;
     address public owner;
@@ -206,6 +209,11 @@ contract BnbitSwap {
         owner = msg.sender;
     }
 
+    /**
+     * @dev swap token for exact token using pancake IPancakeRouter02
+     * @param amountIn amount of token to swap
+     * @param amountOutMin amount of token to receive
+     */
     function bnbSwapToken(
         address token,
         uint amountIn,
@@ -233,6 +241,10 @@ contract BnbitSwap {
         Iwep.withdraw(amount);
     }
 
+    /**
+     * @dev BNBit Org withdraws charges from contract
+     * @param amount amount of token to withdraw
+     */
     function withdraw(uint amount, address token) public {
         require(msg.sender == owner, "Only Owner can Call this function");
         IBEP20(token).approve(msg.sender, amount);
