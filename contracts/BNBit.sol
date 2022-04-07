@@ -18,7 +18,7 @@ contract BNBit is Ownable, ReentrancyGuard {
     uint256 private constant MAX_LEVEL = 5;
     uint256 private constant MIN_REWARDS = 1;
     uint256 private constant MAX_REWARDS = 200;
-    uint256 private constant REWARD_PERIOD = 0; // 86400; // 24 hours
+    uint256 private constant REWARD_PERIOD = 86400; // 24 hours
 
     // current count of investors
     uint256 private investorCount = INIT_INVESTOR;
@@ -364,17 +364,11 @@ contract BNBit is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @dev gets an investor by id
-     * @param _id uint256 of the investor id
+     * @dev gets an investor by id address
      * @return investor of the investor
      */
-    function getInvestor(uint256 _id)
-        internal
-        view
-        returns (Investor memory investor)
-    {
-        address _address = investorIds[_id];
-        return investors[_address];
+    function profile() public view returns (Investor memory investor) {
+        return investors[msg.sender];
     }
 
     /**
