@@ -43,6 +43,9 @@ contract BNBit is Ownable, ReentrancyGuard {
 
     // investor struct
     struct Investor {
+        // id of our investor
+        uint256 id;
+        // a  portfolio index
         uint256[] investments;
         // start time for each investment
         uint256[] rewardTimes;
@@ -129,6 +132,7 @@ contract BNBit is Ownable, ReentrancyGuard {
             );
             investorCount++;
             investorIds[investorCount] = msg.sender;
+            investors[msg.sender].id = investorCount;
             investors[msg.sender].uplineId = _uplineId;
             payReferrals(msg.value, _uplineId, 1);
         }
