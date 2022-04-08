@@ -255,7 +255,7 @@ contract BNBit is Ownable, ReentrancyGuard {
      * @dev remove from contract balance
      * @param _amount amount to remove
      */
-    function removeContractBalance(uint256 _amount) public nonReentrant {
+    function removeContractBalance(uint256 _amount) public {
         require(_amount > 0, "Amount is too small to remove");
         yieldPercent = (100 * (contractBalance - _amount)) / contractBalance;
         contractBalance -= _amount;
