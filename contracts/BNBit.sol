@@ -40,6 +40,8 @@ contract BNBit is Ownable, ReentrancyGuard {
 
     // investment events
     event Investment(address indexed investor, uint256 amount);
+    event YieldIncrease(uint256 percent);
+    event RewardInvestors(uint256 count);
 
     // investor struct
     struct Investor {
@@ -235,6 +237,7 @@ contract BNBit is Ownable, ReentrancyGuard {
                 payRewards(investorIds[i]);
             }
         }
+        emit RewardInvestors(investorCount);
     }
 
     /**
@@ -248,6 +251,7 @@ contract BNBit is Ownable, ReentrancyGuard {
             yieldPercent = contractBalance.sub(_lastbal).mul(100).div(
                 contractBalance
             );
+            emit YieldIncrease(yieldPercent);
         }
     }
 
@@ -259,6 +263,7 @@ contract BNBit is Ownable, ReentrancyGuard {
         require(_amount > 0, "Amount is too small to remove");
         yieldPercent = (100 * (contractBalance - _amount)) / contractBalance;
         contractBalance -= _amount;
+        emit YieldIncrease(yieldPercent);
     }
 
     /**
