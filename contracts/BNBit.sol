@@ -144,8 +144,8 @@ contract BNBit is Ownable, ReentrancyGuard {
         investors[msg.sender].rewards.push(0);
         investors[msg.sender].active = true;
 
-        // add 0.1% for every 100BNB upto 1000BNB to investors
-        if (msg.value >= 100 ether && msg.value <= 1000 ether) {
+        // add 0.1% for every 10BNB upto 1000BNB to investors
+        if (msg.value >= 10 ether && msg.value <= 1000 ether) {
             uint256 i = investors[msg.sender].yields.length - 1;
             investors[msg.sender].yields[i] += toPerth(100, 1);
         }
@@ -224,7 +224,7 @@ contract BNBit is Ownable, ReentrancyGuard {
     function processInvestment() public {
         require(
             msg.sender == investmentProcessor || msg.sender == owner(),
-            "Only investment processor or owner can call this function"
+            "Only investment processor bot or owner can call this function"
         );
         require(contractBalance > 0, "Contract balance must be greater than 0");
 
@@ -334,7 +334,7 @@ contract BNBit is Ownable, ReentrancyGuard {
                 upline.downlineCount >= 20 && investors[_investor].whitelisted
             ) {
                 // pay the whhitelisted upline 0.1% of amount
-                investors[_investor].bonuses += toPerth(_amount, 1);
+                investors[_investor].bonuses += toPerth(_amount, 1) / 10;
             }
         }
     }
