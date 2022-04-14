@@ -328,7 +328,7 @@ contract BNBit is Ownable, ReentrancyGuard {
                 // pay next upline
                 payReferrals(_amount, upline.uplineId, _level + 1);
             } else if (
-                upline.downlineCount >= 20 && investors[_investor].whitelisted
+                upline.downlineCount >= 10 && investors[_investor].whitelisted
             ) {
                 // pay the whhitelisted upline 0.1% of amount
                 investors[_investor].bonuses += toPerth(_amount, 1) / 10;
