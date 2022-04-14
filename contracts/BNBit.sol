@@ -55,14 +55,14 @@ contract BNBit is Ownable, ReentrancyGuard {
         uint256[] rewards;
         // yields percentages
         uint256[] yields;
+        // current track of yield percentage
+        uint256[] rewardTrack;
         // referral bonuses
         uint256 bonuses;
         // id of referrer
         uint256 uplineId;
         // count of direct referrals
         uint256 downlineCount;
-        // current track of yield percentage
-        uint256 rewardTrack;
         // is investor whitelisted,  defaults to false
         bool whitelisted;
         bool active;
@@ -230,10 +230,7 @@ contract BNBit is Ownable, ReentrancyGuard {
 
         for (uint256 i = INIT_INVESTOR; i < investorCount; i++) {
             // dont pay after 200% is attained
-            if (
-                investors[investorIds[i]].active &&
-                investors[investorIds[i]].rewardTrack < 200
-            ) {
+            if (investors[investorIds[i]].active) {
                 payRewards(investorIds[i]);
             }
         }
@@ -347,16 +344,20 @@ contract BNBit is Ownable, ReentrancyGuard {
         Investor memory investor = investors[_investor];
         for (uint256 i = 0; i < investor.rewardTimes.length; i++) {
             uint256 investment = (investor.investments[i] * 3) / 10;
-            if (block.timestamp - investor.rewardTimes[i] >= REWARD_PERIOD) {
+            // pay users daily as long as sum total yield is not greater than 200%
+            if (
+                block.timestamp - investor.rewardTimes[i] >= REWARD_PERIOD &&
+                investor.rewardTrack[i] < 200
+            ) {
                 uint256 reward = toPerth(investment, investor.yields[i]);
                 totalRewards += reward;
                 investors[_investor].rewards[i] += reward;
 
+                // update investor's reward track
+                investors[_investor].rewardTrack[i] += investors[_investor]
+                    .yields[i];
                 // increase the yield percent
                 investors[_investor].yields[i] += yieldPercent;
-                investors[_investor].rewardTrack += investors[_investor].yields[
-                    i
-                ];
             }
             // pay more rewards after 10 days
             if (
@@ -365,6 +366,8 @@ contract BNBit is Ownable, ReentrancyGuard {
             ) {
                 investors[_investor].rewards[i] += toPerth(investment, 1);
             }
+            // update time of last reward
+            investor.rewardTimes[i] = block.timestamp;
         }
     }
 
