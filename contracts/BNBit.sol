@@ -8,6 +8,10 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+
+/**
+* BNBi
+*/
 contract BNBit is Ownable, ReentrancyGuard {
     // use safe math library to make maths easier
     using Math for uint256;
@@ -114,12 +118,16 @@ contract BNBit is Ownable, ReentrancyGuard {
 
         investment.withdrawn += _withdraw;
 
-        removeBalance(investment.withdrawn);
+        _removeBalance(investment.withdrawn);
+    }
+
+    function withdrawBalance(uint256 _amount) external onlyOwner {
+        _removeBalance(_amount);
     }
 
     function withdrawBonus() external onlyInvestor {
-        uint256 bonus = getBonus();
-        removeBalance(bonus);
+        uint256 bonus = _getBonus(msg.sender, 0);
+        _removeBalance(bonus);
     }
 
     function reInvest(uint256 _investmentID) external onlyInvestor {
@@ -127,11 +135,11 @@ contract BNBit is Ownable, ReentrancyGuard {
             _investmentID
         ];
 
-        (, uint256 _withdraw, ) = getInvestment(_investmentID);
+        (, uint256 _amount, ) = getInvestment(_investmentID);
 
-        investment.withdrawn += _withdraw;
+        investment.withdrawn += _amount;
 
-        _investBnb(_withdraw);
+        _investBnb(_amount);
     }
 
     function setWhitelist(address _investor, bool _status)
@@ -236,11 +244,11 @@ contract BNBit is Ownable, ReentrancyGuard {
         (, earnings) = amount.mul(percent).div(10).trySub(investment.withdrawn);
     }
 
-    function getBonus() public view onlyInvestor returns (uint256 bonus) {
-        bonus += getBonus(msg.sender, 0);
+    function getBonus() external view onlyInvestor returns (uint256 bonus) {
+        bonus += _getBonus(msg.sender, 0);
     }
 
-    function getBonus(address _investor, uint256 _level)
+    function _getBonus(address _investor, uint256 _level)
         internal
         view
         returns (uint256 bonus)
@@ -276,7 +284,7 @@ contract BNBit is Ownable, ReentrancyGuard {
         emit NewInvestment(msg.sender, _amount);
     }
 
-    function removeBalance(uint256 amount) internal nonReentrant {
+    function _removeBalance(uint256 amount) internal nonReentrant {
         require(amount > 0, "Specify a bigger amount to withdraw");
         require(balance > amount, "Amount too big to be withdrawn");
 
